@@ -3,7 +3,6 @@ package SplendorPlayerAndLearner
 import kotlin.test.Test
 
 class BaseSplendorTest {
-
     @Test(expected = Exception::class)
     fun buyFailsWithInsufficientFunds() {
         val p1 = PlayerState(Player(1, "p1"), GemMap(mapOf()), 0, listOf(), listOf(), listOf())
