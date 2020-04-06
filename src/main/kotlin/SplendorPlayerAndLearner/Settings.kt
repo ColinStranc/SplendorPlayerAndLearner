@@ -1,4 +1,4 @@
 package SplendorPlayerAndLearner
 
-data class Settings(val targetVictoryPoints: Int) {
+data class Settings(val gemStock: Int, val targetVictoryPoints: Int) {
 }
