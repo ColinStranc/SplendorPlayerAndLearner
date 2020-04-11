@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 import java.lang.Exception
 
@@ -22,7 +22,8 @@ class GemMap(private val map: Map<Gem, Int>) {
 
     companion object {
         fun plus(g1: GemMap, g2: GemMap): GemMap {
-            return GemMap(Gem.values().associate { gem -> Pair(gem, g1[gem] + g2[gem]) })
+            return GemMap(
+                Gem.values().associate { gem -> Pair(gem, g1[gem] + g2[gem]) })
         }
     }
 }

@@ -1,6 +1,6 @@
-package SplendorPlayerAndLearner.util
+package splendor.core.util
 
-import SplendorPlayerAndLearner.CostService
+import splendor.core.CostService
 
 object MockImplementations {
     fun successCostService(): CostService {

@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 // TODO: This really should encapsulate the idea of "Baseline math" where you have a value available to you which does
 //  not have to be used. This concept can be tile and chip and cost agnostic.

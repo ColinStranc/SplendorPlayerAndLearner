@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 class InsufficientFundsException(
     actual: GemMap,

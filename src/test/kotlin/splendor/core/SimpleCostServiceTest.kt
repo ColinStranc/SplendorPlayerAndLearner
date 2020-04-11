@@ -1,10 +1,11 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SimpleCostServiceTest {
-    private var costService: SimpleCostService = SimpleCostService
+    private var costService: SimpleCostService =
+        SimpleCostService
 
     private val LESS_THAN = "less than"
     private val EQUAL_TO = "equal to"
@@ -93,7 +94,7 @@ class SimpleCostServiceTest {
     }
 
     private fun testComparison(cost: Int, chip: Int, tile: Int, desiredComparison: Int) {
-        val comparison: Int = costService.compareCostToPayment(cost, chip, tile)
+        val comparison: Int = SimpleCostService.compareCostToPayment(cost, chip, tile)
 
         assertEquals(desiredComparison, comparison, comparisonMessage(cost, chip, tile, desiredComparison, comparison))
     }

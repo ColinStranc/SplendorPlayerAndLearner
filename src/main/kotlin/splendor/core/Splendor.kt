@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 interface Splendor {
     fun acquireThreeDistinctResources(state: State, gem1: Gem, gem2: Gem, gem3: Gem): State

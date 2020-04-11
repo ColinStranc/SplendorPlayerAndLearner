@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 /**
  * Payment in the form of chips, reusable tile resources, and wildcards. The wildcards must already be assigned to Gem

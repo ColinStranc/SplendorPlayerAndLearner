@@ -1,6 +1,7 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
-class BaseSplendor(private val costService: CostService) : Splendor {
+class BaseSplendor(private val costService: CostService) :
+    Splendor {
     override fun acquireThreeDistinctResources(state: State, gem1: Gem, gem2: Gem, gem3: Gem): State {
         TODO("Not yet implemented")
     }
@@ -31,9 +32,10 @@ class BaseSplendor(private val costService: CostService) : Splendor {
             // TODO: This is a monstrosity.
             val resourcesOnHand: GemMap = playerState.tiles.fold(
                 GemMap(mapOf()), { gm, t ->
-                    GemMap(Gem.values().associate { gem ->
-                        Pair(gem, gm[gem] + t.rewardGems[gem])
-                    })
+                    GemMap(
+                        Gem.values().associate { gem ->
+                            Pair(gem, gm[gem] + t.rewardGems[gem])
+                        })
                 }
             )
 

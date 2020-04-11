@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 enum class Gem {
     BLACK,

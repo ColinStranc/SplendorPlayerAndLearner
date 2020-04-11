@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 data class PlayerState(
     val player: Player,

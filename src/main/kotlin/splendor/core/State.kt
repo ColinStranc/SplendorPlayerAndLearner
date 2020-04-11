@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 // TODO: Does making these lists and such public mean people can modify the list itself through the accessor? I want to
 //  make this information readily available to whoever owns me, but I don't want anyone to be able modify anything about

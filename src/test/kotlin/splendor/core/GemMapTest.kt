@@ -1,4 +1,4 @@
-package SplendorPlayerAndLearner
+package splendor.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
