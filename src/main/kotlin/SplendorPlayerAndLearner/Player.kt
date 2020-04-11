@@ -1,5 +1,3 @@
 package SplendorPlayerAndLearner
 
-data class Player(val id: Int, val name: String) {
-
-}
+data class Player(val id: Int, val name: String)

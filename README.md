@@ -18,3 +18,18 @@
 - A* player
 
 - Evolutionary A
+
+### Database Rough Schema
+
+#### Game
+
+- id
+- settings
+- activeStateHistoryId
+
+
+#### StateHistory
+
+- id
+- activeStateId
+- previousStateHistoryId

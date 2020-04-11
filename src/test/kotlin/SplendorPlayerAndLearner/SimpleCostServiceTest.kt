@@ -2,11 +2,9 @@ package SplendorPlayerAndLearner
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
-class CostServiceTest {
-    private var costService: CostService = CostService
+class SimpleCostServiceTest {
+    private var costService: SimpleCostService = SimpleCostService
 
     private val LESS_THAN = "less than"
     private val EQUAL_TO = "equal to"

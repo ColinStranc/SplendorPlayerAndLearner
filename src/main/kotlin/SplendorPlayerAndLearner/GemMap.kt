@@ -19,4 +19,10 @@ class GemMap(private val map: Map<Gem, Int>) {
     operator fun get(gem: Gem): Int {
         return map[gem] ?: 0
     }
+
+    companion object {
+        fun plus(g1: GemMap, g2: GemMap): GemMap {
+            return GemMap(Gem.values().associate { gem -> Pair(gem, g1[gem] + g2[gem]) })
+        }
+    }
 }

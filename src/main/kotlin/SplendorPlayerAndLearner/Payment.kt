@@ -7,5 +7,4 @@ package SplendorPlayerAndLearner
  * @param tiles
  * @param wildcards
  */
-data class Payment(val chips: GemMap, val tiles: GemMap, val wildcards: GemMap) {
-}
+data class Payment(val chips: GemMap, val tiles: GemMap, val wildcards: GemMap)

@@ -1,40 +1,62 @@
 package SplendorPlayerAndLearner
 
-class BaseSplendor(private val state: State) : Splendor {
-    override fun acquireThreeDistinctResources(player: Player, gem1: Gem, gem2: Gem, gem3: Gem) {
+class BaseSplendor(private val costService: CostService) : Splendor {
+    override fun acquireThreeDistinctResources(state: State, gem1: Gem, gem2: Gem, gem3: Gem): State {
         TODO("Not yet implemented")
     }
 
-    override fun acquireTwoOfSameResource(player: Player, type: Gem) {
+    override fun acquireTwoOfSameResource(state: State, type: Gem): State {
         TODO("Not yet implemented")
     }
 
-    override fun acquireWildcardAndTile(player: Player, tile: Tile) {
+    override fun acquireWildcardAndTile(state: State, tileId: Int): State {
         TODO("Not yet implemented")
     }
 
-    override fun buyTile(player: Player, tile: Tile, chips: GemMap, wildcards: GemMap) {
+    override fun buyTile(state: State, tileId: Int, chips: GemMap, wildcards: GemMap): State {
         // TODO: check if game is over
 
-        val activePlayerState = state.players[state.activeTurnIndex]
+        val playerState = state.players[state.activeTurnIndex]
 
-        if (activePlayerState.player != player) {
-            throw IllegalActionException("Player ${player.name} (${player.id}) not active")
+        if (!covers(playerState.chips, chips)) {
+            throw InsufficientFundsException(playerState.chips, chips)
         }
 
-        if (!covers(activePlayerState.chips, chips)) {
-            throw InsufficientFundsException(activePlayerState.chips, chips)
-        }
-    }
+        val displayedTiles: List<Tile> = state.tierDecks.fold(listOf(), { tiles, tier -> tiles.plus(tier.displayed) })
 
-    override fun getState(): State {
-        TODO("Not yet implemented")
+        val tile: Tile = displayedTiles.find { (id) -> id == tileId }
+            ?: throw IllegalActionException("Tile '$tileId' is not available")
+
+        for (gem in Gem.values()) {
+            // TODO: This is a monstrosity.
+            val resourcesOnHand: GemMap = playerState.tiles.fold(
+                GemMap(mapOf()), { gm, t ->
+                    GemMap(Gem.values().associate { gem ->
+                        Pair(gem, gm[gem] + t.rewardGems[gem])
+                    })
+                }
+            )
+
+            if (
+                costService.compareCostToPayment(
+                    tile.cost[gem],
+                    chips[gem] + wildcards[gem],
+                    resourcesOnHand[gem]
+                ) != 0
+            ) {
+                // TODO: Better exception, better message
+                throw Exception("Payment provided was not sufficient")
+            }
+        }
+
+        // TODO: calculate a new state
+        return state
     }
 
     // TODO: This does not belong here. Some sort of GemMap math?
-    private fun covers(covering: GemMap, coveree: GemMap): Boolean {
+    private fun covers(covering: GemMap, covered: GemMap): Boolean {
         for (gem in Gem.values()) {
-            if (covering[gem] < coveree[gem]) {
+            if (covering[gem] < covered[gem]) {
                 return false
             }
         }

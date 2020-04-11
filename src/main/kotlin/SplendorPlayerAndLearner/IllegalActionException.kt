@@ -1,4 +1,3 @@
 package SplendorPlayerAndLearner
 
-class IllegalActionException(m: String) : Exception(m) {
-}
+class IllegalActionException(m: String) : Exception(m)

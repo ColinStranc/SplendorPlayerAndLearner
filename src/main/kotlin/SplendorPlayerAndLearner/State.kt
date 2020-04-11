@@ -7,8 +7,7 @@ package SplendorPlayerAndLearner
 // Note: Do I want convenience accessors here or do I want a StateService?
 data class State(
     val players: List<PlayerState>,
-    val tierDecks: List<TierState>,
+    val tierDecks: List<DeckState>,
     val activeTurnIndex: Int,
     val settings: Settings
-) {
-}
+)

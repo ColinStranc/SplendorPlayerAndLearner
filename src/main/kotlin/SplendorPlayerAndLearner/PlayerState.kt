@@ -7,5 +7,4 @@ data class PlayerState(
     val tiles: List<Tile>,
     val reservedTiles: List<Tile>,
     val influenceCards: List<InfluenceCard>
-) {
-}
+)

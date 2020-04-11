@@ -1,4 +1,3 @@
 package SplendorPlayerAndLearner
 
-data class InfluenceCard(val id: Int, val cost: GemMap, val victoryPoints: Int) {
-}
+data class InfluenceCard(val id: Int, val cost: GemMap, val victoryPoints: Int)
