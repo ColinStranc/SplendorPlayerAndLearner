@@ -4,19 +4,18 @@
 
 - Standarize a Project Structure
   - What different projects do we have?
-  
+- Work out distinction between Splendor and SplendorService.
+  - They need to be merged and then have a new useful separation pulled out. It may be as simple as a rename and a tiny
+  functional change
+  - This is highlighting the fact that the API is a bit weird. We want similar handling of the different actions (such 
+  as updating state, active turn index, saving actions...) across all functions, but they have no common definition 
+  forced upon them at the moment.
 - Make an Exception strategy
-
 - Integration testing
-
 - Logging
-
 - Database connection
-
 - Console Player
-
 - A* player
-
 - Evolutionary A
 
 ### Database Rough Schema

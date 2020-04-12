@@ -31,6 +31,43 @@ class BaseSplendorServiceTest {
     }
 
     @Test
+    fun acquireTwoResourcesAddsResourcesToPlayerWithNothing() {
+        val playerGems = 0
+        val gem = Gem.BLACK
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(MI.emptyPlayer("p1").copy(chips = GemMap(mapOf(gem to playerGems))))
+        )
+
+        val playerId: String = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireTwoOfSameResource(oldState, gem)
+
+        assertEquals(playerGems + 2, state.players.find { (player) -> player.id == playerId }!!.chips[gem])
+    }
+
+    @Test
+    fun acquireTwoResourcesAddsResourcesToPlayerWithManyGems() {
+        val playerGems = 17
+        val gem = Gem.BLACK
+
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(MI.emptyPlayer("p1").copy(chips = GemMap(Gem.values().associate { g -> g to playerGems })))
+        )
+
+        val playerId: String = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireTwoOfSameResource(oldState, gem)
+
+        assertEquals(playerGems + 2, state.players.find { (player) -> player.id == playerId }!!.chips[gem])
+    }
+
+    @Test
     fun buyRemovesResourcesAddsTileToPlayerStateReplacesTileInDeck() {
         val p1 = PlayerState(
             Player("1", "p1"),
