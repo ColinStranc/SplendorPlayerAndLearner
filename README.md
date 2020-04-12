@@ -33,3 +33,8 @@
 - id
 - activeStateId
 - previousStateHistoryId
+
+### Analysis Questions
+
+- How much does the non-tier 1 decks affect the first move?
+- How often should you target the VP tier 1 cards early

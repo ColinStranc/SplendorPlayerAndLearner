@@ -10,11 +10,11 @@ class BaseSplendorService(private val costService: CostService) :
         TODO("Not yet implemented")
     }
 
-    override fun acquireWildcardAndTile(state: State, tileId: Int): State {
+    override fun acquireWildcardAndTile(state: State, tileId: String): State {
         TODO("Not yet implemented")
     }
 
-    override fun buyTile(state: State, tileId: Int, chips: GemMap, wildcards: GemMap): State {
+    override fun buyTile(state: State, tileId: String, chips: GemMap, wildcards: GemMap): State {
         // TODO: check if game is over
 
         val playerState = state.players[state.activeTurnIndex]

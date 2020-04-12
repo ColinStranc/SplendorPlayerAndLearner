@@ -208,15 +208,11 @@ class ConsolePlayer {
         return gem
     }
 
-    private fun readId(idType: String): Int {
+    private fun readId(idType: String): String {
         print("Enter $idType Id: ")
         val idString = readLine()
         if (idString != null) {
-            try {
-                return idString.toInt()
-            } catch (_: NumberFormatException) {
-                // TODO: log or something
-            }
+            return idString
         }
 
         throw Exception("Could not read Id from '$idString'.")
