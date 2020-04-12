@@ -1,6 +1,6 @@
 package splendor.core
 
-class SplendorJustPlay(private val costService: CostService, p1: String, p2: String) : Splendor {
+class SplendorJustPlay(private val splendorService: SplendorService, p1: String, p2: String) : Splendor {
     private var state: State = State(
         settings = Settings(5, 5),
         winner = null,
@@ -14,20 +14,20 @@ class SplendorJustPlay(private val costService: CostService, p1: String, p2: Str
         return state.copy();
     }
 
-    override fun buyTile(tileId: String) {
-        TODO("Not yet implemented")
+    override fun buyTile(tileId: String, chips: GemMap, wildcards: GemMap) {
+        state = splendorService.buyTile(state, tileId, chips, wildcards)
     }
 
     override fun acquireTwoOfSameResource(resource: Gem) {
-        TODO("Not yet implemented")
+        state = splendorService.acquireTwoOfSameResource(state, resource)
     }
 
     override fun acquireThreeDistinctResources(resource1: Gem, resource2: Gem, resource3: Gem) {
-        TODO("Not yet implemented")
+        state = splendorService.acquireThreeDistinctResources(state, resource1, resource2, resource3)
     }
 
     override fun acquireWildcardAndTile(tileId: String) {
-        TODO("Not yet implemented")
+        state = splendorService.acquireWildcardAndTile(state, tileId)
     }
 
     companion object {

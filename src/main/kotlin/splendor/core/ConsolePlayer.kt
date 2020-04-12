@@ -6,18 +6,20 @@ import kotlin.text.StringBuilder
 class ConsolePlayer {
     private val DEFAULT_NAME_PREFIX = "no-name-"
 
+    private var state: State? = null
+
     fun play() {
         val game: Splendor = startGame()
 
-        var state: State = game.getState()
-        while (!state.finished) {
+        state = game.getState()
+        while (!state!!.finished) {
             println("Displayed Tiles:")
-            printTiles(state)
+            printTiles(state!!)
             println()
 
             // TODO: I don't think we want to get active player state like this
             //  really I think state has to be reorganized and rethought
-            val active = state.players[state.activeTurnIndex]
+            val active = state!!.players[state!!.activeTurnIndex]
             println("Player '${active.player.name}' possessions:")
             printPossessions(active)
             println()
@@ -27,7 +29,7 @@ class ConsolePlayer {
             state = game.getState()
         }
 
-        val winner: Player? = state.winner
+        val winner: Player? = state!!.winner
 
         if (winner == null) {
             throw Exception("Finished game with no winner.")
@@ -47,7 +49,7 @@ class ConsolePlayer {
         println("Player 2 named: '$pTwoName'.")
 
         return SplendorJustPlay(
-            SimpleCostService,
+            BaseSplendorService(SimpleCostService),
             pOneName ?: "<${DEFAULT_NAME_PREFIX}1>",
             pTwoName ?: "<${DEFAULT_NAME_PREFIX}2>"
         )
@@ -90,7 +92,17 @@ class ConsolePlayer {
                 try {
                     val tileId = readId("Tile")
 
-                    game.buyTile(tileId)
+                    val tile = getTileFromId(tileId)
+
+                    val player = state!!.players[state!!.activeTurnIndex]
+                    val spentChips = GemMap(Gem.values().associate { g ->
+                        Pair(g, Math.min(player.chips[g], tile.cost[g] - player.tileGems[g]))
+                    })
+                    val spendWildcards = GemMap(Gem.values().associate { g ->
+                        Pair(g, Math.max(0, tile.cost[g] - (player.tileGems[g] + spentChips[g])))
+                    })
+
+                    game.buyTile(tileId, spentChips, spendWildcards)
                     return
                 } catch (e: Exception) {
                     println("Failed to buy tile: ${e.message}")
@@ -132,6 +144,14 @@ class ConsolePlayer {
         b.appendln()
 
         print(b.toString())
+    }
+
+    private fun getTileFromId(tId: String): Tile {
+        val tile = (state!!.tierDecks.fold(listOf<Tile>()) { l, deck ->
+            l.plus(deck.displayed)
+        }).find { (id) -> id == tId }
+
+        return tile ?: throw Exception("Tile '$tId' did not exist")
     }
 
     private fun tileDisplayString(tile: Tile): String {

@@ -15,7 +15,7 @@ class BaseSplendorServiceTest {
     @Test
     fun buyRemovesResourcesAddsTileToPlayerStateReplacesTileInDeck() {
         val p1 = PlayerState(
-            Player(1, "p1"),
+            Player("1", "p1"),
             GemMap(mapOf(Gem.BLACK to 1)),
             0,
             listOf(),
@@ -23,27 +23,28 @@ class BaseSplendorServiceTest {
             listOf()
         )
         val t1 = Tile(
-            1,
+            "1",
             GemMap(mapOf(Gem.BLACK to 1)),
             GemMap(mapOf()),
             0
         )
         val t2 = Tile(
-            2,
+            "2",
             GemMap(mapOf()),
             GemMap(mapOf()),
             0
         )
-        val d1 = DeckState(1, "d1", listOf(t2), listOf(t1))
+        val d1 = DeckState("1", "d1", listOf(t2), listOf(t1))
         val settings = Settings(0, 0)
-        val state = State(listOf(p1), listOf(d1), 0, settings)
+        val state = State(listOf(p1), listOf(d1), 0, settings, null)
 
         val splendor =
             BaseSplendorService(MockImplementations.successCostService())
 
-        val newState = splendor.buyTile(state, t1.id,
-                                        GemMap(mapOf(Gem.BLACK to 1)),
-                                        GemMap(mapOf())
+        val newState = splendor.buyTile(
+            state, t1.id,
+            GemMap(mapOf(Gem.BLACK to 1)),
+            GemMap(mapOf())
         )
 
         assertEquals(0, newState.players[0].chips[Gem.BLACK])
@@ -55,7 +56,7 @@ class BaseSplendorServiceTest {
     @Test(expected = Exception::class)
     fun buyFailsWithInsufficientFunds() {
         val p1 = PlayerState(
-            Player(1, "p1"),
+            Player("1", "p1"),
             GemMap(mapOf()),
             0,
             listOf(),
@@ -63,7 +64,7 @@ class BaseSplendorServiceTest {
             listOf()
         )
         val p2 = PlayerState(
-            Player(2, "p2"),
+            Player("2", "p2"),
             GemMap(mapOf()),
             0,
             listOf(),
@@ -71,21 +72,22 @@ class BaseSplendorServiceTest {
             listOf()
         )
         val tile = Tile(
-            1,
+            "1",
             GemMap(mapOf()),
             GemMap(mapOf()),
             0
         )
-        val t1 = DeckState(1, "t1", listOf(), listOf(tile))
+        val t1 = DeckState("1", "t1", listOf(), listOf(tile))
         val settings = Settings(0, 0)
-        val state = State(listOf(p1, p2), listOf(t1), 0, settings)
+        val state = State(listOf(p1, p2), listOf(t1), 0, settings, null)
 
         val splendor =
             BaseSplendorService(MockImplementations.successCostService())
 
-        splendor.buyTile(state, tile.id,
-                         GemMap(mapOf(Gem.BLACK to 1)),
-                         GemMap(mapOf())
+        splendor.buyTile(
+            state, tile.id,
+            GemMap(mapOf(Gem.BLACK to 1)),
+            GemMap(mapOf())
         )
     }
 }
