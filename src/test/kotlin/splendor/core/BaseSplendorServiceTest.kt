@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 //  - About to retest a bunch of "valid move" functionality across each action (although that is more design question
 //  than test question)
 //  - Creating too much cruft? Maybe it is fine though.
-class BaseSplendorTest {
+class BaseSplendorServiceTest {
     @Test
     fun buyRemovesResourcesAddsTileToPlayerStateReplacesTileInDeck() {
         val p1 = PlayerState(
@@ -39,7 +39,7 @@ class BaseSplendorTest {
         val state = State(listOf(p1), listOf(d1), 0, settings)
 
         val splendor =
-            BaseSplendor(MockImplementations.successCostService())
+            BaseSplendorService(MockImplementations.successCostService())
 
         val newState = splendor.buyTile(state, t1.id,
                                         GemMap(mapOf(Gem.BLACK to 1)),
@@ -81,7 +81,7 @@ class BaseSplendorTest {
         val state = State(listOf(p1, p2), listOf(t1), 0, settings)
 
         val splendor =
-            BaseSplendor(MockImplementations.successCostService())
+            BaseSplendorService(MockImplementations.successCostService())
 
         splendor.buyTile(state, tile.id,
                          GemMap(mapOf(Gem.BLACK to 1)),

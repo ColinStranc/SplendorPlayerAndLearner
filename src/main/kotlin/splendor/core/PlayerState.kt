@@ -7,4 +7,14 @@ data class PlayerState(
     val tiles: List<Tile>,
     val reservedTiles: List<Tile>,
     val influenceCards: List<InfluenceCard>
-)
+) {
+    val vp: Int = (influenceCards.fold(0) { sum, ic ->
+        sum + ic.victoryPoints
+    }) + (tiles.fold(0) { sum, t ->
+        sum + t.victoryPoints
+    })
+
+    val tileGems: GemMap = tiles.fold(GemMap(mapOf())) { map, tile ->
+        GemMap((Gem.values().associate { g -> Pair(g, map[g] + tile.rewardGems[g]) }))
+    }
+}

@@ -1,7 +1,7 @@
 package splendor.core
 
-class BaseSplendor(private val costService: CostService) :
-    Splendor {
+class BaseSplendorService(private val costService: CostService) :
+    SplendorService {
     override fun acquireThreeDistinctResources(state: State, gem1: Gem, gem2: Gem, gem3: Gem): State {
         TODO("Not yet implemented")
     }

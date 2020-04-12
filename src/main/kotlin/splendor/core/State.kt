@@ -9,5 +9,8 @@ data class State(
     val players: List<PlayerState>,
     val tierDecks: List<DeckState>,
     val activeTurnIndex: Int,
-    val settings: Settings
-)
+    val settings: Settings,
+    val winner: Player?
+) {
+    val finished: Boolean = winner != null
+}
