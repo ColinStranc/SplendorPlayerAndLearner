@@ -7,22 +7,43 @@ const val TURN_INDEX_PROGRESSION: Int = 1
 class BaseSplendorService(private val costService: CostService) :
     SplendorService {
     override fun acquireThreeDistinctResources(state: State, gem1: Gem, gem2: Gem, gem3: Gem): State {
-        TODO("Not yet implemented")
+        val playerUpdatedState = acquireResources(
+            state.players[state.activeTurnIndex],
+            GemMap(
+                mapOf(
+                    gem1 to UNIQUE_RESOURCE_RETRIEVAL_COUNT,
+                    gem2 to UNIQUE_RESOURCE_RETRIEVAL_COUNT,
+                    gem3 to UNIQUE_RESOURCE_RETRIEVAL_COUNT
+                )
+            )
+        )
+
+        return updateTurn(state.copy(players = state.players.map { ps ->
+            if (ps.player.id == playerUpdatedState.player.id) playerUpdatedState else ps
+        }))
     }
 
     override fun acquireTwoOfSameResource(state: State, type: Gem): State {
-        val playerOriginalState = state.players[state.activeTurnIndex]
-        val playerUpdatedState = playerOriginalState.copy(
-            chips = GemMap(Gem.values().associate { g ->
-                g to playerOriginalState.chips[g] + SAME_RESOURCE_RETRIEVAL_COUNT
-            })
+        val playerUpdatedState = acquireResources(
+            state.players[state.activeTurnIndex],
+            GemMap(mapOf(type to SAME_RESOURCE_RETRIEVAL_COUNT))
         )
-        val oldActiveIndex = state.activeTurnIndex
-        val newActiveIndex = (oldActiveIndex + TURN_INDEX_PROGRESSION) % state.players.size
 
-        return state.copy(players = state.players.map { ps ->
+        return updateTurn(state.copy(players = state.players.map { ps ->
             if (ps.player.id == playerUpdatedState.player.id) playerUpdatedState else ps
-        }, activeTurnIndex = newActiveIndex)
+        }))
+    }
+
+    private fun acquireResources(playerState: PlayerState, gemMap: GemMap): PlayerState {
+        return playerState.copy(
+            chips = GemMap.plus(
+                playerState.chips, gemMap
+            )
+        )
+    }
+
+    private fun updateTurn(state: State): State {
+        return state.copy(activeTurnIndex = (state.activeTurnIndex + TURN_INDEX_PROGRESSION) % state.players.size)
     }
 
     override fun acquireWildcardAndTile(state: State, tileId: String): State {

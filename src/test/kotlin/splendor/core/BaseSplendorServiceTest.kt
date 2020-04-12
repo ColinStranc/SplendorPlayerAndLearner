@@ -1,10 +1,7 @@
 package splendor.core
 
+import kotlin.test.*
 import splendor.core.util.MockImplementations as MI
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 // TODO: These are not great yet.
 //  - Magic numbers in the test conditions
@@ -21,13 +18,39 @@ class BaseSplendorServiceTest {
             players = listOf(MI.emptyPlayer("p1").copy(chips = GemMap(mapOf(gem to playerGems))))
         )
 
-        val playerId: String = oldState.players[oldState.activeTurnIndex].player.id
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
 
         val service = BaseSplendorService(MI.successCostService())
 
         val state = service.acquireTwoOfSameResource(oldState, gem)
 
         assertEquals(playerGems + 2, state.players.find { (player) -> player.id == playerId }!!.chips[gem])
+    }
+
+    @Test
+    fun acquireTwoResourcesDoesNotChangeOtherResources() {
+        val playerGems = 17
+        val gem = Gem.BLACK
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(
+                MI.emptyPlayer("p1").copy(
+                    chips = GemMap(Gem.values().associate { g -> g to playerGems })
+                )
+            )
+        )
+
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireTwoOfSameResource(oldState, gem)
+
+        for (g in Gem.values()) {
+            if (g != gem) {
+                assertEquals(playerGems, state.players.find { (player) -> player.id == playerId }!!.chips[g])
+            }
+        }
     }
 
     @Test
@@ -39,7 +62,7 @@ class BaseSplendorServiceTest {
             players = listOf(MI.emptyPlayer("p1").copy(chips = GemMap(mapOf(gem to playerGems))))
         )
 
-        val playerId: String = oldState.players[oldState.activeTurnIndex].player.id
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
 
         val service = BaseSplendorService(MI.successCostService())
 
@@ -53,12 +76,15 @@ class BaseSplendorServiceTest {
         val playerGems = 17
         val gem = Gem.BLACK
 
-
         val oldState = MI.simpleState().copy(
-            players = listOf(MI.emptyPlayer("p1").copy(chips = GemMap(Gem.values().associate { g -> g to playerGems })))
+            players = listOf(
+                MI.emptyPlayer("p1").copy(
+                    chips = GemMap(Gem.values().associate { g -> g to playerGems })
+                )
+            )
         )
 
-        val playerId: String = oldState.players[oldState.activeTurnIndex].player.id
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
 
         val service = BaseSplendorService(MI.successCostService())
 
@@ -68,6 +94,61 @@ class BaseSplendorServiceTest {
     }
 
     @Test
+    fun acquireThreeResourcesAddsResourcesToPlayer() {
+        val playerGems = 1
+        val g1 = Gem.RED
+        val g2 = Gem.WHITE
+        val g3 = Gem.BLUE
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(
+                MI.emptyPlayer("p1").copy(
+                    chips = GemMap(mapOf(g1 to playerGems, g2 to playerGems, g3 to playerGems))
+                )
+            )
+        )
+
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireThreeDistinctResources(oldState, g1, g2, g3)
+
+        assertEquals(playerGems + 1, state.players.find { (player) -> player.id == playerId }!!.chips[g1])
+        assertEquals(playerGems + 1, state.players.find { (player) -> player.id == playerId }!!.chips[g2])
+        assertEquals(playerGems + 1, state.players.find { (player) -> player.id == playerId }!!.chips[g3])
+    }
+
+    @Test
+    fun acquireThreeResourcesDoesNotChangeOtherResources() {
+        val playerGems = 1
+        val g1 = Gem.RED
+        val g2 = Gem.WHITE
+        val g3 = Gem.BLUE
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(
+                MI.emptyPlayer("p1").copy(
+                    chips = GemMap(Gem.values().associate { g -> g to playerGems })
+                )
+            )
+        )
+
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireThreeDistinctResources(oldState, g1, g2, g3)
+
+        for (g in Gem.values()) {
+            if (g != g1 && g != g2 && g != g3) {
+                assertEquals(playerGems, state.players.find { (player) -> player.id == playerId }!!.chips[g])
+            }
+        }
+    }
+
+    @Test
+    @Ignore("Out of date, really.")
     fun buyRemovesResourcesAddsTileToPlayerStateReplacesTileInDeck() {
         val p1 = PlayerState(
             Player("1", "p1"),

@@ -10,6 +10,8 @@
   - This is highlighting the fact that the API is a bit weird. We want similar handling of the different actions (such 
   as updating state, active turn index, saving actions...) across all functions, but they have no common definition 
   forced upon them at the moment.
+- Fix Decks
+- Clean up TODO list!
 - Make an Exception strategy
 - Integration testing
 - Logging
