@@ -7,6 +7,7 @@ package splendor.core
 // Note: Do I want convenience accessors here or do I want a StateService?
 // TODO: Influence Cards
 data class State(
+    // TODO: Map<player Id, PlayerState> and player state doesn't know the player
     val players: List<PlayerState>,
     val tierDecks: List<DeckState>,
     val activeTurnIndex: Int,

@@ -1,6 +1,6 @@
 package splendor.core
 
-import splendor.core.util.MockImplementations
+import splendor.core.util.MockImplementations as MI
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -12,6 +12,24 @@ import kotlin.test.assertTrue
 //  than test question)
 //  - Creating too much cruft? Maybe it is fine though.
 class BaseSplendorServiceTest {
+    @Test
+    fun acquireTwoResourcesAddsResourcesToActivePlayer() {
+        val playerGems = 1
+        val gem = Gem.BLACK
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(MI.emptyPlayer("p1").copy(chips = GemMap(mapOf(gem to playerGems))))
+        )
+
+        val playerId: String = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireTwoOfSameResource(oldState, gem)
+
+        assertEquals(playerGems + 2, state.players.find { (player) -> player.id == playerId }!!.chips[gem])
+    }
+
     @Test
     fun buyRemovesResourcesAddsTileToPlayerStateReplacesTileInDeck() {
         val p1 = PlayerState(
@@ -39,7 +57,7 @@ class BaseSplendorServiceTest {
         val state = State(listOf(p1), listOf(d1), 0, settings, null)
 
         val splendor =
-            BaseSplendorService(MockImplementations.successCostService())
+            BaseSplendorService(MI.successCostService())
 
         val newState = splendor.buyTile(
             state, t1.id,
@@ -82,7 +100,7 @@ class BaseSplendorServiceTest {
         val state = State(listOf(p1, p2), listOf(t1), 0, settings, null)
 
         val splendor =
-            BaseSplendorService(MockImplementations.successCostService())
+            BaseSplendorService(MI.successCostService())
 
         splendor.buyTile(
             state, tile.id,

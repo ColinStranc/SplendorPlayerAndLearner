@@ -1,5 +1,9 @@
 package splendor.core
 
+const val SAME_RESOURCE_RETRIEVAL_COUNT: Int = 2
+const val UNIQUE_RESOURCE_RETRIEVAL_COUNT: Int = 1
+const val TURN_INDEX_PROGRESSION: Int = 1
+
 class BaseSplendorService(private val costService: CostService) :
     SplendorService {
     override fun acquireThreeDistinctResources(state: State, gem1: Gem, gem2: Gem, gem3: Gem): State {
@@ -7,7 +11,18 @@ class BaseSplendorService(private val costService: CostService) :
     }
 
     override fun acquireTwoOfSameResource(state: State, type: Gem): State {
-        TODO("Not yet implemented")
+        val playerOriginalState = state.players[state.activeTurnIndex]
+        val playerUpdatedState = playerOriginalState.copy(
+            chips = GemMap(Gem.values().associate { g ->
+                g to playerOriginalState.chips[g] + SAME_RESOURCE_RETRIEVAL_COUNT
+            })
+        )
+        val oldActiveIndex = state.activeTurnIndex
+        val newActiveIndex = (oldActiveIndex + TURN_INDEX_PROGRESSION) % state.players.size
+
+        return state.copy(players = state.players.map { ps ->
+            if (ps.player.id == playerUpdatedState.player.id) playerUpdatedState else ps
+        }, activeTurnIndex = newActiveIndex)
     }
 
     override fun acquireWildcardAndTile(state: State, tileId: String): State {
