@@ -19,6 +19,7 @@
 - Console Player
 - A* player
 - Evolutionary A
+- Add Messages to Unit test asserts
 
 ### Database Rough Schema
 

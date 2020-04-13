@@ -41,6 +41,10 @@ object MockImplementations {
         )
     }
 
+    fun emptyTile(id: String): Tile {
+        return Tile(id, GemMap(mapOf()), GemMap(mapOf()), 0)
+    }
+
     // TODO: What kind of settings?
     fun baseSettings(): Settings {
         return Settings(5, 5)

@@ -148,6 +148,75 @@ class BaseSplendorServiceTest {
     }
 
     @Test
+    fun reserveAddsWildcardMovesTileToReservedListAndPlacesNewTile() {
+        val wildcardCount = 2
+        val reservedTiles: List<Tile> = listOf()
+        val toReserve = MI.emptyTile("t-res")
+        val displayed = listOf(toReserve)
+        val replacementTile = MI.emptyTile("t-rep")
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(
+                MI.emptyPlayer("p1").copy(
+                    wildcards = wildcardCount,
+                    reservedTiles = reservedTiles
+                )
+            ),
+            tierDecks = listOf(
+                DeckState("d1", "d1", listOf(replacementTile), displayed)
+            )
+        )
+
+        val playerId = oldState.players[oldState.activeTurnIndex].player.id
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireWildcardAndTile(oldState, toReserve.id)
+
+        val player = state.players.find { (player) -> player.id == playerId }
+
+        assertEquals(wildcardCount + 1, player!!.wildcards)
+        assertEquals(reservedTiles.size + 1, player!!.reservedTiles.size)
+        assertEquals(displayed.size, state.tierDecks[0].displayed.size)
+        assertTrue(state.tierDecks[0].displayed.contains(replacementTile))
+        assertFalse(state.tierDecks[0].deck.contains(replacementTile))
+    }
+
+    // TODO: Is this the behaviour we want? Should it configurable by settings? Should it be allowed by the service no
+    //  matter the settings so that the game decides?
+    @Test
+    fun reserveWithNoMoreTilesToDisplayLeavesLessDisplayedCards() {
+        val displayed = MI.emptyTile("t-res")
+
+        val oldState = MI.simpleState().copy(
+            tierDecks = listOf(
+                DeckState("d1", "d1", listOf(), listOf(displayed))
+            )
+        )
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.acquireWildcardAndTile(oldState, displayed.id)
+
+        assertTrue(state.tierDecks[0].displayed.isEmpty())
+    }
+
+    @Test(expected = Exception::class)
+    fun reserveFailsWithInvalidTileId() {
+        val id = "non-existent"
+
+        val oldState = MI.simpleState().copy(
+            tierDecks = listOf(
+                DeckState("d1", "d1", listOf(), listOf())
+            )
+        )
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        service.acquireWildcardAndTile(oldState, id)
+    }
+
+    @Test
     @Ignore("Out of date, really.")
     fun buyRemovesResourcesAddsTileToPlayerStateReplacesTileInDeck() {
         val p1 = PlayerState(

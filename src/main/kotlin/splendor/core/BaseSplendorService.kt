@@ -35,7 +35,31 @@ class BaseSplendorService(private val costService: CostService) :
     }
 
     override fun acquireWildcardAndTile(state: State, tileId: String): State {
-        TODO("Not yet implemented")
+        val tier = state.tierDecks.find { d -> d.displayed.any { (id) -> id == tileId } }
+            ?: throw Exception("Tile '$tileId' unavailable for being reserved")
+        val tile = tier.displayed.find { (id) -> id == tileId }
+            ?: throw Exception("Tile '$tileId' unavailable for being reserved")
+
+        val newDisplayed = if (
+            tier.deck.isEmpty()
+        ) tier.displayed.minus(tile) else tier.displayed.minus(tile).plus(tier.deck[0])
+        val newDeck = if (tier.deck.isEmpty()) tier.deck else tier.deck.minus(tier.deck[0])
+
+        val newTier = tier.copy(
+            displayed = newDisplayed,
+            deck = newDeck
+        )
+
+        val p = state.players[state.activeTurnIndex]
+        val newP = p.copy(
+            wildcards = p.wildcards + 1,
+            reservedTiles = p.reservedTiles.plus(listOf(tile))
+        )
+
+        return updateTurn(state.copy(
+            players = state.players.map { ps -> if (ps.player.id == p.player.id) newP else ps },
+            tierDecks = state.tierDecks.map { d -> if (d.id == tier.id) newTier else d }
+        ))
     }
 
     override fun buyTile(state: State, tileId: String, chips: GemMap, wildcards: GemMap): State {
