@@ -35,20 +35,8 @@ class BaseSplendorService(private val costService: CostService) :
     }
 
     override fun acquireWildcardAndTile(state: State, tileId: String): State {
-        val tier = state.tierDecks.find { d -> d.displayed.any { (id) -> id == tileId } }
-            ?: throw Exception("Tile '$tileId' unavailable for being reserved")
-        val tile = tier.displayed.find { (id) -> id == tileId }
-            ?: throw Exception("Tile '$tileId' unavailable for being reserved")
-
-        val newDisplayed = if (
-            tier.deck.isEmpty()
-        ) tier.displayed.minus(tile) else tier.displayed.minus(tile).plus(tier.deck[0])
-        val newDeck = if (tier.deck.isEmpty()) tier.deck else tier.deck.minus(tier.deck[0])
-
-        val newTier = tier.copy(
-            displayed = newDisplayed,
-            deck = newDeck
-        )
+        val tile = findTile(state, tileId)
+        val newTiers = replaceTile(state.tierDecks, tile)
 
         val p = state.players[state.activeTurnIndex]
         val newP = p.copy(
@@ -56,51 +44,48 @@ class BaseSplendorService(private val costService: CostService) :
             reservedTiles = p.reservedTiles.plus(listOf(tile))
         )
 
-        return updateTurn(state.copy(
-            players = state.players.map { ps -> if (ps.player.id == p.player.id) newP else ps },
-            tierDecks = state.tierDecks.map { d -> if (d.id == tier.id) newTier else d }
-        ))
+        return updateTurn(
+            state.copy(
+                players = state.players.map { ps -> if (ps.player.id == p.player.id) newP else ps },
+                tierDecks = newTiers
+            )
+        )
     }
 
     override fun buyTile(state: State, tileId: String, chips: GemMap, wildcards: GemMap): State {
-        // TODO: check if game is over
+        val tile = findTile(state, tileId)
+        val newDecks = replaceTile(state.tierDecks, tile)
 
-        val playerState = state.players[state.activeTurnIndex]
+        val p = state.players[state.activeTurnIndex]
+        val newP = p.copy(
+            chips = GemMap(Gem.values().associate { g -> g to p.chips[g] - chips[g] }),
+            wildcards = p.wildcards - Gem.values().fold(0) { s, g -> s + wildcards[g] },
+            tiles = p.tiles.plus(tile)
+        )
 
-        if (!covers(playerState.chips, chips)) {
-            throw InsufficientFundsException(playerState.chips, chips)
-        }
-
-        val displayedTiles: List<Tile> = state.tierDecks.fold(listOf(), { tiles, tier -> tiles.plus(tier.displayed) })
-
-        val tile: Tile = displayedTiles.find { (id) -> id == tileId }
-            ?: throw IllegalActionException("Tile '$tileId' is not available")
-
-        for (gem in Gem.values()) {
-            // TODO: This is a monstrosity.
-            val resourcesOnHand: GemMap = playerState.tiles.fold(
-                GemMap(mapOf()), { gm, t ->
-                    GemMap(
-                        Gem.values().associate { gem ->
-                            Pair(gem, gm[gem] + t.rewardGems[gem])
-                        })
-                }
+        return updateTurn(
+            state.copy(
+                players = state.players.map { ps -> if (ps.player.id == p.player.id) newP else ps },
+                tierDecks = newDecks
             )
+        )
+    }
 
-            if (
-                costService.compareCostToPayment(
-                    tile.cost[gem],
-                    chips[gem] + wildcards[gem],
-                    resourcesOnHand[gem]
-                ) != 0
-            ) {
-                // TODO: Better exception, better message
-                throw Exception("Payment provided was not sufficient")
-            }
-        }
+    private fun findTile(state: State, tileId: String): Tile {
+        return (state.tierDecks.fold(listOf<Tile>()) { ts, d -> ts.plus(d.displayed) }).find { (id) -> id == tileId }
+            ?: throw Exception("Tile '$tileId' unavailable for being purchased")
+    }
 
-        // TODO: calculate a new state
-        return state
+    private fun replaceTile(decks: List<DeckState>, tile: Tile): List<DeckState> {
+        val deck = decks.find { ds -> ds.displayed.contains(tile) }
+            ?: throw Exception("Tile '${tile.id}' was not displayed, could not be replaced")
+
+        val newDisplayed = if (
+            deck.deck.isEmpty()
+        ) deck.displayed.minus(tile) else deck.displayed.minus(tile).plus(deck.deck[0])
+        val newDeck = if (deck.deck.isEmpty()) deck.deck else deck.deck.minus(deck.deck[0])
+
+        return decks.map { d -> if (d.id == deck.id) deck.copy(displayed = newDisplayed, deck = newDeck) else d }
     }
 
     private fun acquireResources(playerState: PlayerState, gemMap: GemMap): PlayerState {

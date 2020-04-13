@@ -152,7 +152,6 @@ class BaseSplendorServiceTest {
         val wildcardCount = 2
         val reservedTiles: List<Tile> = listOf()
         val toReserve = MI.emptyTile("t-res")
-        val displayed = listOf(toReserve)
         val replacementTile = MI.emptyTile("t-rep")
 
         val oldState = MI.simpleState().copy(
@@ -163,7 +162,7 @@ class BaseSplendorServiceTest {
                 )
             ),
             tierDecks = listOf(
-                DeckState("d1", "d1", listOf(replacementTile), displayed)
+                DeckState("d1", "d1", listOf(replacementTile), listOf(toReserve))
             )
         )
 
@@ -177,7 +176,6 @@ class BaseSplendorServiceTest {
 
         assertEquals(wildcardCount + 1, player!!.wildcards)
         assertEquals(reservedTiles.size + 1, player!!.reservedTiles.size)
-        assertEquals(displayed.size, state.tierDecks[0].displayed.size)
         assertTrue(state.tierDecks[0].displayed.contains(replacementTile))
         assertFalse(state.tierDecks[0].deck.contains(replacementTile))
     }
@@ -214,5 +212,51 @@ class BaseSplendorServiceTest {
         val service = BaseSplendorService(MI.successCostService())
 
         service.acquireWildcardAndTile(oldState, id)
+    }
+
+    @Test
+    fun buyTileRemovesSpentChipsAddsTileReplacesTileInDeck() {
+        val cost = GemMap(mapOf(Gem.BLACK to 2, Gem.WHITE to 3, Gem.RED to 2))
+        val tile = Tile("t1", cost, GemMap(mapOf()), 0)
+        val tiles: List<Tile> = listOf()
+        val replacement = MI.emptyTile("t2")
+
+        val oldState = MI.simpleState().copy(
+            players = listOf(
+                MI.emptyPlayer("p1").copy(
+                    tiles = tiles,
+                    chips = cost
+                )
+            ),
+            tierDecks = listOf(DeckState("d", "d", listOf(replacement), listOf(tile)))
+        )
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        val state = service.buyTile(oldState, tile.id, cost, GemMap(mapOf()))
+
+        val player = state.players[state.activeTurnIndex]
+
+        for (gem in Gem.values()) {
+            assertEquals(0, player.chips[gem])
+        }
+        assertEquals(tiles.size + 1, player.tiles.size)
+        assertTrue(player.tiles.contains(tile))
+        assertFalse(state.tierDecks[0].displayed.contains(tile))
+        assertTrue(state.tierDecks[0].displayed.contains(replacement))
+        assertFalse(state.tierDecks[0].deck.contains(replacement))
+    }
+
+    @Test(expected = Exception::class)
+    fun buyTileFailsWithInvalidTileId() {
+        val id = "non-existent"
+
+        val oldState = MI.simpleState().copy(
+            tierDecks = listOf(DeckState("d", "d", listOf(), listOf()))
+        )
+
+        val service = BaseSplendorService(MI.successCostService())
+
+        service.buyTile(oldState, id, GemMap(mapOf()), GemMap(mapOf()))
     }
 }
