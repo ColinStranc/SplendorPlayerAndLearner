@@ -34,18 +34,6 @@ class BaseSplendorService(private val costService: CostService) :
         }))
     }
 
-    private fun acquireResources(playerState: PlayerState, gemMap: GemMap): PlayerState {
-        return playerState.copy(
-            chips = GemMap.plus(
-                playerState.chips, gemMap
-            )
-        )
-    }
-
-    private fun updateTurn(state: State): State {
-        return state.copy(activeTurnIndex = (state.activeTurnIndex + TURN_INDEX_PROGRESSION) % state.players.size)
-    }
-
     override fun acquireWildcardAndTile(state: State, tileId: String): State {
         TODO("Not yet implemented")
     }
@@ -89,6 +77,18 @@ class BaseSplendorService(private val costService: CostService) :
 
         // TODO: calculate a new state
         return state
+    }
+
+    private fun acquireResources(playerState: PlayerState, gemMap: GemMap): PlayerState {
+        return playerState.copy(
+            chips = GemMap.plus(
+                playerState.chips, gemMap
+            )
+        )
+    }
+
+    private fun updateTurn(state: State): State {
+        return state.copy(activeTurnIndex = (state.activeTurnIndex + TURN_INDEX_PROGRESSION) % state.players.size)
     }
 
     // TODO: This does not belong here. Some sort of GemMap math?
