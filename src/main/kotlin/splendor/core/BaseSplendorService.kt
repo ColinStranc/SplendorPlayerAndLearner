@@ -2,7 +2,6 @@ package splendor.core
 
 const val SAME_RESOURCE_RETRIEVAL_COUNT: Int = 2
 const val UNIQUE_RESOURCE_RETRIEVAL_COUNT: Int = 1
-const val TURN_INDEX_PROGRESSION: Int = 1
 
 class BaseSplendorService(private val costService: CostService) :
     SplendorService {
